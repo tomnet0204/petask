@@ -34,6 +34,14 @@ export default function PetAskTopPage() {
             🐱 猫の症状を調べる
           </Link>
         </div>
+        <div className="pt-2">
+          <Link
+            href="/petask/checker"
+            className="inline-flex items-center justify-center gap-2 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 font-semibold px-6 py-3 rounded-xl transition-colors"
+          >
+            📋 症状チェッカーを試す
+          </Link>
+        </div>
       </section>
 
       {/* 緊急症状CTA */}

@@ -22,6 +22,7 @@ export default function PetAskLayout({ children }: { children: React.ReactNode }
           <nav className="flex items-center gap-4 text-sm text-slate-600">
             <a href="/petask/dogs" className="hover:text-slate-900">犬</a>
             <a href="/petask/cats" className="hover:text-slate-900">猫</a>
+            <a href="/petask/checker" className="text-blue-600 font-medium hover:text-blue-700">チェッカー</a>
             <a href="/petask/emergency" className="text-red-600 font-medium hover:text-red-700">緊急症状</a>
           </nav>
         </div>
