@@ -24,9 +24,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const meta = SYMPTOMS_BY_ANIMAL[animal as AnimalType]?.find((s) => s.slug === symptom);
   if (!meta) return {};
   const animalLabel = animal === 'dog' ? '犬' : '猫';
+  const title = `${meta.label}の症状と対処法 | ${animalLabel}の症状チェック - PetAsk`;
+  const description = `${meta.label}で${animalLabel}が苦しんでいる場合の緊急度・症状の見分け方・受診タイミングをわかりやすく解説。`;
   return {
-    title: `${animalLabel}の${meta.label}`,
-    description: `${animalLabel}が${meta.label}のとき、緊急度と動物病院への受診タイミング、獣医師への伝え方を解説します。`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
   };
 }
 
@@ -48,6 +60,15 @@ export default async function SymptomPage({ params }: Props) {
   const animalLabel = animal === 'dog' ? '犬' : '猫';
   const animalEmoji = animal === 'dog' ? '🐶' : '🐱';
   const urgency = URGENCY_CONFIG[meta.emergencyLevel];
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: `${meta.label}の症状と対処法`,
+    description: `${meta.label}で${animalLabel}が苦しんでいる場合の緊急度・症状の見分け方・受診タイミングをわかりやすく解説。`,
+    author: { '@type': 'Organization', name: 'PetAsk編集部' },
+    publisher: { '@type': 'Organization', name: 'PetAsk' },
+    keywords: meta.keywords.join(', '),
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -131,6 +152,11 @@ export default async function SymptomPage({ params }: Props) {
       )}
 
       <DisclaimerBanner />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* 関連ページ */}
       <div className="border-t border-slate-200 pt-4">

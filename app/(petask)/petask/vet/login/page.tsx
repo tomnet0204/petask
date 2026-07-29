@@ -1,14 +1,37 @@
-import type { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Breadcrumb from '@/components/petask/Breadcrumb';
 
-export const metadata: Metadata = {
-  title: '獣医師ログイン',
-  description: 'PetAsk Q&A 獣医師向けログインページ',
-  robots: 'noindex',
-};
-
 export default function VetLoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/petask/vet/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'ログインに失敗しました');
+      router.push('/petask/vet/dashboard');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'ログインに失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="max-w-md mx-auto px-4 py-12 space-y-6">
       <Breadcrumb items={[
@@ -22,54 +45,44 @@ export default function VetLoginPage() {
         <p className="text-slate-500 text-sm">認証済み獣医師の方はログインしてください</p>
       </div>
 
-      {/* ログインフォーム（UI mockup — Supabase Auth 連携後に動作） */}
-      <div className="border border-slate-200 rounded-2xl p-6 space-y-4">
+      <form onSubmit={handleLogin} className="border border-slate-200 rounded-2xl p-6 space-y-4">
         <div className="space-y-1">
           <label className="block text-sm font-medium text-slate-700">メールアドレス</label>
           <input
             type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             placeholder="vet@example.com"
-            disabled
-            className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-400 cursor-not-allowed"
+            required
+            className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
         <div className="space-y-1">
           <label className="block text-sm font-medium text-slate-700">パスワード</label>
           <input
             type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
             placeholder="••••••••"
-            disabled
-            className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-400 cursor-not-allowed"
+            required
+            className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
-
-        {/* 準備中バナー */}
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-amber-700">
-          <p className="font-semibold mb-1">⚙️ 認証システム設定中</p>
-          <p>現在、獣医師向けログイン機能の設定を進めています。参加をご希望の獣医師の方は、お問い合わせよりご連絡ください。</p>
-        </div>
-
+        {error && <p className="text-sm text-red-500">{error}</p>}
         <button
-          type="button"
-          disabled
-          className="w-full bg-slate-300 text-white font-semibold py-3 rounded-xl text-sm cursor-not-allowed"
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-300 text-white font-semibold py-3 rounded-xl text-sm transition-colors"
         >
-          ログイン（準備中）
+          {loading ? 'ログイン中...' : 'ログイン'}
         </button>
-      </div>
+      </form>
 
-      <div className="text-center space-y-2 text-sm text-slate-500">
-        <p>参加をご希望の獣医師の方は</p>
-        <Link href="/petask/contact" className="text-green-600 hover:underline">
-          お問い合わせフォームへ →
-        </Link>
-      </div>
-
-      <div className="border-t border-slate-200 pt-4 text-center">
-        <Link href="/petask/vets" className="text-sm text-slate-400 hover:text-slate-600">
-          回答獣医師一覧を見る
-        </Link>
-      </div>
+      <p className="text-center text-xs text-slate-400">
+        獣医師アカウントの登録は
+        <Link href="/petask/vets" className="text-green-600 hover:underline ml-1">こちら</Link>
+        からお問い合わせください
+      </p>
     </div>
   );
 }
