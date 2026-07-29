@@ -17,8 +17,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!question) return {};
   const animalLabel = question.animalType === 'dog' ? '犬' : '猫';
   return {
-    title: `${question.petName}（${animalLabel}）への質問`,
+    title: `${question.petName}（${animalLabel}）への質問 | PetAsk`,
     description: question.body.slice(0, 120),
+    openGraph: {
+      title: `${question.petName}（${animalLabel}）への質問`,
+      description: question.body.slice(0, 120),
+    },
   };
 }
 
@@ -39,6 +43,30 @@ export default async function QADetailPage({ params }: Props) {
   if (!question) notFound();
 
   const status = STATUS_CONFIG[question.status];
+  const animalLabel = question.animalType === 'dog' ? '犬' : '猫';
+  const urgency = (question.checkerResult as { urgencyLevel?: string } | null | undefined)?.urgencyLevel as
+    'emergency' | 'urgent' | 'watchful' | 'monitor' | undefined;
+  const acceptedAnswer = answers.find(a => a.isAccepted);
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'QAPage',
+    mainEntity: {
+      '@type': 'Question',
+      name: `${question.petName}（${animalLabel}）への質問`,
+      text: question.body,
+      answerCount: answers.length,
+      dateCreated: question.createdAt,
+      ...(acceptedAnswer && {
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: acceptedAnswer.body,
+          dateCreated: acceptedAnswer.createdAt,
+          author: { '@type': 'Person', name: acceptedAnswer.vet.name },
+        },
+      }),
+    },
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -47,6 +75,10 @@ export default async function QADetailPage({ params }: Props) {
         { label: 'Q&A', href: '/petask/q-and-a' },
         { label: '質問詳細' },
       ]} />
+
+      {(urgency === 'emergency' || urgency === 'urgent') && (
+        <DisclaimerBanner urgency={urgency} />
+      )}
 
       {/* 質問カード */}
       <div className="border border-slate-200 rounded-xl p-5 space-y-4">
@@ -92,7 +124,6 @@ export default async function QADetailPage({ params }: Props) {
             <p className="text-xs">通常1〜3日以内に回答が届きます</p>
           </div>
         ) : (
-          // ベストアンサーを先に表示
           [...answers]
             .sort((a, b) => (b.isAccepted ? 1 : 0) - (a.isAccepted ? 1 : 0))
             .map(answer => <AnswerCard key={answer.id} answer={answer} />)
@@ -105,11 +136,15 @@ export default async function QADetailPage({ params }: Props) {
         <Link href="/petask/q-and-a" className="text-green-600 hover:underline">
           ← Q&A一覧に戻る
         </Link>
-        <Link href="/petask/q-and-a/new"
-          className="text-green-600 hover:underline">
+        <Link href="/petask/q-and-a/new" className="text-green-600 hover:underline">
           新しく質問する →
         </Link>
       </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     </div>
   );
 }
