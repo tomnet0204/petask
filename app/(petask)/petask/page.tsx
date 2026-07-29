@@ -41,7 +41,7 @@ const CATEGORIES = [
     desc: '意識喪失・呼吸困難・排尿困難など今すぐ受診が必要なサイン',
     color: 'bg-red-50 border-red-200 hover:border-red-400',
     textColor: 'text-red-700',
-    img: 'https://images.unsplash.com/photo-1628009368231-7bb7cfcfdef3?w=400&q=75',
+    img: 'https://images.unsplash.com/photo-1654895716780-b4664497420d?w=400&q=75',
   },
 ];
 
@@ -121,7 +121,7 @@ export default function PetAskTopPage() {
           <div className="flex-shrink-0 w-full md:w-80 lg:w-96">
             <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="https://images.unsplash.com/photo-1559563458-527698bf5295?w=600&q=80"
+                src="https://plus.unsplash.com/premium_photo-1661916447474-235409b19e16?w=600&q=80"
                 alt="ペットを診察する獣医師"
                 fill
                 className="object-cover"
@@ -190,11 +190,7 @@ export default function PetAskTopPage() {
 
             {STEPS.map(({ step, icon, title, desc }) => (
               <div key={step} className="relative bg-white rounded-2xl border border-gray-200 p-6 shadow-sm text-center z-10">
-                <div className="w-10 h-10 rounded-full text-white text-sm font-bold flex items-center justify-center mx-auto mb-3"
-                  style={{ backgroundColor: '#16a34a' }}>
-                  {step}
-                </div>
-                <div className="text-3xl mb-3">{icon}</div>
+                <div className="text-4xl mb-3">{icon}</div>
                 <p className="font-bold text-gray-800 mb-2">{title}</p>
                 <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
               </div>
@@ -220,18 +216,15 @@ export default function PetAskTopPage() {
 
         <div className="grid sm:grid-cols-2 gap-3">
           {[
-            { rank: 1, icon: '🤮', sym: '嘔吐・吐き気', tag: '犬・猫', urgency: '要確認' },
-            { rank: 2, icon: '💩', sym: '下痢・軟便', tag: '犬・猫', urgency: '要確認' },
-            { rank: 3, icon: '😮', sym: '食欲不振', tag: '犬・猫', urgency: '様子見' },
-            { rank: 4, icon: '🚽', sym: 'おしっこが出ない', tag: '猫', urgency: '緊急' },
-            { rank: 5, icon: '😮‍💨', sym: '咳・くしゃみ', tag: '犬・猫', urgency: '様子見' },
-            { rank: 6, icon: '😵', sym: 'ぐったりしている', tag: '犬・猫', urgency: '緊急' },
-          ].map(({ rank, icon, sym, tag, urgency }) => (
-            <div key={rank} className="flex items-center gap-4 bg-white border border-gray-200 rounded-xl p-4 hover:border-green-300 hover:shadow-sm transition-all cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-400 shrink-0">
-                {rank}
-              </div>
-              <span className="text-xl shrink-0">{icon}</span>
+            { key: 'vomit', icon: '🤮', sym: '嘔吐・吐き気', tag: '犬・猫', urgency: '要確認' },
+            { key: 'diarr', icon: '💩', sym: '下痢・軟便', tag: '犬・猫', urgency: '要確認' },
+            { key: 'noeat', icon: '😮', sym: '食欲不振', tag: '犬・猫', urgency: '様子見' },
+            { key: 'pee', icon: '🚽', sym: 'おしっこが出ない', tag: '猫', urgency: '緊急' },
+            { key: 'cough', icon: '😮‍💨', sym: '咳・くしゃみ', tag: '犬・猫', urgency: '様子見' },
+            { key: 'weak', icon: '😵', sym: 'ぐったりしている', tag: '犬・猫', urgency: '緊急' },
+          ].map(({ key, icon, sym, tag, urgency }) => (
+            <div key={key} className="flex items-center gap-4 bg-white border border-gray-200 rounded-xl p-4 hover:border-green-300 hover:shadow-sm transition-all cursor-pointer">
+              <span className="text-2xl shrink-0">{icon}</span>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-800 text-sm">{sym}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{tag}</p>
