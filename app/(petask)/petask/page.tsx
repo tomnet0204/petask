@@ -241,6 +241,40 @@ export default function PetAskTopPage() {
         </div>
       </section>
 
+      {/* ===== 獣医師Q&A CTA ===== */}
+      <section className="max-w-6xl mx-auto px-4 py-12">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-6">
+          <div className="flex-1 space-y-3">
+            <div className="inline-flex items-center gap-2 text-xs font-semibold text-green-700 bg-white border border-green-300 px-3 py-1 rounded-full">
+              🩺 NEW — 獣医師Q&A
+            </div>
+            <h2 className="text-xl font-bold text-slate-900">気になることは獣医師に聞こう</h2>
+            <p className="text-slate-600 text-sm leading-relaxed">
+              症状チェッカーで解決しなかった疑問は、認証済み獣医師に直接質問できます。<br />
+              無料・登録不要。通常1〜3日で回答が届きます。
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <a href="/petask/q-and-a/new"
+                className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">
+                ✏️ 質問を投稿する
+              </a>
+              <a href="/petask/q-and-a"
+                className="inline-flex items-center gap-1.5 border border-green-400 text-green-700 hover:bg-green-50 font-medium px-5 py-2.5 rounded-xl text-sm transition-colors">
+                Q&A一覧を見る →
+              </a>
+            </div>
+          </div>
+          <div className="shrink-0 text-center space-y-3">
+            <div className="text-6xl">💬</div>
+            <div className="space-y-1 text-xs text-slate-500">
+              <div className="flex items-center gap-1.5 justify-center"><span className="text-green-500">✓</span> 認証済み獣医師が回答</div>
+              <div className="flex items-center gap-1.5 justify-center"><span className="text-green-500">✓</span> 無料・登録不要</div>
+              <div className="flex items-center gap-1.5 justify-center"><span className="text-green-500">✓</span> 1〜3日で回答</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== 免責バナー ===== */}
       <div className="max-w-6xl mx-auto px-4 pb-8">
         <DisclaimerBanner />

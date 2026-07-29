@@ -75,3 +75,41 @@ export interface SymptomMeta {
   emergencyLevel: 'high' | 'medium' | 'low';
   keywords: string[];
 }
+
+// Q&A関連型
+export type QuestionStatus = 'pending' | 'answered' | 'closed';
+
+export interface Question {
+  id: string;
+  petName: string;
+  animalType: AnimalType;
+  ageYears?: number;
+  sex?: 'male' | 'female' | 'unknown';
+  body: string;
+  symptomSlug?: string;
+  checkerResult?: CheckerResult;
+  imageUrls?: string[];
+  status: QuestionStatus;
+  userEmail?: string;
+  answerCount: number;
+  createdAt: string;
+}
+
+export interface Answer {
+  id: string;
+  questionId: string;
+  vet: VetProfile;
+  body: string;
+  isAccepted: boolean;
+  createdAt: string;
+}
+
+export interface VetProfile {
+  id: string;
+  name: string;
+  credential: string;
+  specialty: string[];
+  bio?: string;
+  avatarUrl?: string;
+  isVerified: boolean;
+}

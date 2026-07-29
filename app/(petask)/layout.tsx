@@ -32,6 +32,7 @@ export default function PetAskLayout({ children }: { children: React.ReactNode }
             <Link href="/petask/dogs" className="hover:text-green-700 transition-colors">🐶 犬の症状</Link>
             <Link href="/petask/cats" className="hover:text-green-700 transition-colors">🐱 猫の症状</Link>
             <Link href="/petask/emergency" className="text-red-600 hover:text-red-700 transition-colors font-semibold">🚨 緊急症状</Link>
+            <Link href="/petask/q-and-a" className="hover:text-green-700 transition-colors">💬 獣医師Q&A</Link>
           </nav>
 
           {/* CTA */}
@@ -54,6 +55,7 @@ export default function PetAskLayout({ children }: { children: React.ReactNode }
             <Link href="/petask/cats" className="whitespace-nowrap hover:text-green-700">🐱 猫</Link>
             <Link href="/petask/emergency" className="whitespace-nowrap text-red-600 font-semibold">🚨 緊急症状</Link>
             <Link href="/petask/checker" className="whitespace-nowrap text-green-700 font-semibold">📋 チェッカー</Link>
+            <Link href="/petask/q-and-a" className="whitespace-nowrap hover:text-green-700">💬 Q&A</Link>
           </div>
         </div>
       </header>
@@ -80,6 +82,8 @@ export default function PetAskLayout({ children }: { children: React.ReactNode }
                 <Link href="/petask/cats" className="block hover:text-white transition-colors">猫の症状一覧</Link>
                 <Link href="/petask/emergency" className="block hover:text-white transition-colors">緊急症状</Link>
                 <Link href="/petask/checker" className="block hover:text-white transition-colors">症状チェッカー</Link>
+                <Link href="/petask/q-and-a" className="block hover:text-white transition-colors">獣医師Q&A</Link>
+                <Link href="/petask/vets" className="block hover:text-white transition-colors">回答獣医師一覧</Link>
               </div>
               <div className="space-y-2">
                 <p className="text-white font-semibold mb-3">サービス情報</p>
