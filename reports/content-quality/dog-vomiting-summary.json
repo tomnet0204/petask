@@ -1,0 +1,20 @@
+{
+  "animal": "dog",
+  "symptomSlug": "vomiting",
+  "generatedAt": "2026-07-29T00:00:00Z",
+  "medicalSafety": {
+    "passed": true,
+    "errors": [],
+    "warnings": []
+  },
+  "seo": {
+    "passed": true,
+    "errors": [],
+    "warnings": []
+  },
+  "references": {
+    "passed": true,
+    "errors": []
+  },
+  "overallPassed": true
+}

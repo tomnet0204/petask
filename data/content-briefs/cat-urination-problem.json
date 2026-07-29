@@ -1,0 +1,10 @@
+{
+  "animal": "cat",
+  "symptomSlug": "urination-problem",
+  "targetKeywords": ["猫 おしっこ出ない", "猫 尿閉"],
+  "emergencyLevel": "high",
+  "requiredSections": ["緊急度を確認しましょう", "獣医師への伝え方", "持参するもの"],
+  "prohibitedContent": ["病名断定", "投薬指示", "自宅処置推奨"],
+  "referenceUrls": ["https://www.nichiju.or.jp/"],
+  "createdAt": "2026-07-29T00:00:00Z"
+}
