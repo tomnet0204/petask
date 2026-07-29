@@ -1,37 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabase } from '@/lib/petask/supabase';
+import { getQuestions, createQuestion } from '@/lib/petask/db/questions';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const animal = searchParams.get('animal');
-  const status = searchParams.get('status');
-  const limit = parseInt(searchParams.get('limit') ?? '10');
-  const offset = parseInt(searchParams.get('offset') ?? '0');
-
-  const supabase = createServerSupabase();
-
-  if (!supabase) {
-    return NextResponse.json({ questions: [], total: 0, isMock: true });
+  try {
+    const questions = await getQuestions({
+      animal: searchParams.get('animal') ?? undefined,
+      status: searchParams.get('status') ?? undefined,
+      limit: parseInt(searchParams.get('limit') ?? '10'),
+      offset: parseInt(searchParams.get('offset') ?? '0'),
+    });
+    return NextResponse.json({ questions, total: questions.length });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 });
   }
-
-  let query = supabase
-    .from('questions')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  if (animal) query = query.eq('animal_type', animal);
-  if (status) query = query.eq('status', status);
-
-  const { data, count, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  return NextResponse.json({ questions: data, total: count });
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const { petName, animalType, ageYears, sex, symptomSlug, questionBody, userEmail, checkerResult } = body;
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'リクエスト形式が不正です' }, { status: 400 });
+  }
+
+  const { petName, animalType, ageYears, sex, symptomSlug, questionBody, userEmail, checkerResult } = body as {
+    petName?: string; animalType?: string; ageYears?: number; sex?: string;
+    symptomSlug?: string; questionBody?: string; userEmail?: string; checkerResult?: unknown;
+  };
 
   if (!petName || !animalType || !questionBody) {
     return NextResponse.json({ error: '必須項目が不足しています' }, { status: 400 });
@@ -39,33 +36,27 @@ export async function POST(request: NextRequest) {
   if (questionBody.length < 10) {
     return NextResponse.json({ error: '質問は10文字以上で入力してください' }, { status: 400 });
   }
-
-  const supabase = createServerSupabase();
-
-  if (!supabase) {
-    return NextResponse.json({
-      id: 'mock-' + Date.now(),
-      isMock: true,
-      message: '質問を受け付けました（デモモード）',
-    });
+  if (!['dog', 'cat'].includes(animalType)) {
+    return NextResponse.json({ error: 'animalTypeはdogまたはcatを指定してください' }, { status: 400 });
   }
 
-  const { data, error } = await supabase
-    .from('questions')
-    .insert({
-      pet_name: petName,
-      animal_type: animalType,
-      age_years: ageYears,
-      sex,
+  try {
+    const question = await createQuestion({
+      petName,
+      animalType: animalType as 'dog' | 'cat',
+      ageYears: ageYears ? Number(ageYears) : undefined,
+      sex: (sex as 'male' | 'female' | 'unknown') ?? 'unknown',
       body: questionBody,
-      symptom_slug: symptomSlug,
-      checker_result: checkerResult,
-      user_email: userEmail,
-      status: 'pending',
-    })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ id: data.id, message: '質問を受け付けました' });
+      symptomSlug: symptomSlug ?? undefined,
+      checkerResult: checkerResult as never,
+      userEmail: userEmail ?? undefined,
+    });
+    return NextResponse.json(
+      { id: question.id, petName: question.petName, animalType: question.animalType, status: question.status, message: '質問を受け付けました' },
+      { status: 201 }
+    );
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 });
+  }
 }

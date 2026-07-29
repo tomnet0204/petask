@@ -17,14 +17,18 @@ export async function getVets(): Promise<VetProfile[]> {
   const supabase = createServerSupabase();
   if (!supabase) return MOCK_VETS;
 
-  const { data, error } = await supabase
-    .from('vets')
-    .select('*')
-    .eq('is_verified', true)
-    .order('created_at', { ascending: true });
-
-  if (error) { console.error(error); return MOCK_VETS; }
-  return (data ?? []).map(toVet);
+  try {
+    const { data, error } = await supabase
+      .from('vets')
+      .select('*')
+      .eq('is_verified', true)
+      .order('created_at', { ascending: true });
+    if (error) { console.error(error); return MOCK_VETS; }
+    return (data ?? []).map(toVet);
+  } catch (e) {
+    console.error('Supabase接続失敗 (getVets):', e);
+    return MOCK_VETS;
+  }
 }
 
 export async function getVetById(id: string): Promise<VetProfile | null> {

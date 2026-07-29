@@ -25,14 +25,18 @@ export async function getAnswersByQuestionId(questionId: string): Promise<Answer
   const supabase = createServerSupabase();
   if (!supabase) return MOCK_ANSWERS.filter(a => a.questionId === questionId);
 
-  const { data, error } = await supabase
-    .from('answers')
-    .select('*, vets(*)')
-    .eq('question_id', questionId)
-    .order('created_at', { ascending: true });
-
-  if (error) { console.error(error); return []; }
-  return (data ?? []).map(toAnswer);
+  try {
+    const { data, error } = await supabase
+      .from('answers')
+      .select('*, vets(*)')
+      .eq('question_id', questionId)
+      .order('created_at', { ascending: true });
+    if (error) { console.error(error); return []; }
+    return (data ?? []).map(toAnswer);
+  } catch (e) {
+    console.error('Supabase接続失敗 (getAnswers):', e);
+    return MOCK_ANSWERS.filter(a => a.questionId === questionId);
+  }
 }
 
 export async function createAnswer(

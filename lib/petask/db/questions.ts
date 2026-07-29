@@ -26,7 +26,14 @@ export async function getQuestions(opts?: {
   offset?: number;
 }): Promise<Question[]> {
   const supabase = createServerSupabase();
-  if (!supabase) return MOCK_QUESTIONS;
+  if (!supabase) {
+    let results = [...MOCK_QUESTIONS];
+    if (opts?.animal) results = results.filter(q => q.animalType === opts.animal);
+    if (opts?.status) results = results.filter(q => q.status === opts.status);
+    const offset = opts?.offset ?? 0;
+    const limit = opts?.limit ?? 10;
+    return results.slice(offset, offset + limit);
+  }
 
   let query = supabase
     .from('questions')
@@ -37,23 +44,40 @@ export async function getQuestions(opts?: {
   if (opts?.animal) query = query.eq('animal_type', opts.animal);
   if (opts?.status) query = query.eq('status', opts.status);
 
-  const { data, error } = await query;
-  if (error) { console.error(error); return MOCK_QUESTIONS; }
-  return (data ?? []).map(toQuestion);
+  try {
+    const { data, error } = await query;
+    if (error) { console.error(error); return mockFallback(opts); }
+    return (data ?? []).map(toQuestion);
+  } catch (e) {
+    console.error('Supabase接続失敗 (questions):', e);
+    return mockFallback(opts);
+  }
+}
+
+function mockFallback(opts?: { animal?: string; status?: string; limit?: number; offset?: number }): Question[] {
+  let results = [...MOCK_QUESTIONS];
+  if (opts?.animal) results = results.filter(q => q.animalType === opts.animal);
+  if (opts?.status) results = results.filter(q => q.status === opts.status);
+  const offset = opts?.offset ?? 0;
+  return results.slice(offset, offset + (opts?.limit ?? 10));
 }
 
 export async function getQuestionById(id: string): Promise<Question | null> {
   const supabase = createServerSupabase();
   if (!supabase) return MOCK_QUESTIONS.find(q => q.id === id) ?? null;
 
-  const { data, error } = await supabase
-    .from('questions')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) return null;
-  return toQuestion(data);
+  try {
+    const { data, error } = await supabase
+      .from('questions')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error) return MOCK_QUESTIONS.find(q => q.id === id) ?? null;
+    return toQuestion(data);
+  } catch (e) {
+    console.error('Supabase接続失敗 (getQuestionById):', e);
+    return MOCK_QUESTIONS.find(q => q.id === id) ?? null;
+  }
 }
 
 export async function createQuestion(
@@ -64,24 +88,29 @@ export async function createQuestion(
     return { ...data, id: crypto.randomUUID(), status: 'pending', answerCount: 0, createdAt: new Date().toISOString() };
   }
 
-  const { data: row, error } = await supabase
-    .from('questions')
-    .insert({
-      pet_name: data.petName,
-      animal_type: data.animalType,
-      age_years: data.ageYears,
-      sex: data.sex,
-      body: data.body,
-      symptom_slug: data.symptomSlug,
-      checker_result: data.checkerResult,
-      image_urls: data.imageUrls ?? [],
-      user_email: data.userEmail,
-    })
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-  return toQuestion(row);
+  try {
+    const { data: row, error } = await supabase
+      .from('questions')
+      .insert({
+        pet_name: data.petName,
+        animal_type: data.animalType,
+        age_years: data.ageYears,
+        sex: data.sex,
+        body: data.body,
+        symptom_slug: data.symptomSlug,
+        checker_result: data.checkerResult,
+        image_urls: data.imageUrls ?? [],
+        user_email: data.userEmail,
+      })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return toQuestion(row);
+  } catch (e) {
+    // ネットワーク不通時はモックレスポンスを返す
+    console.error('Supabase接続失敗 (createQuestion):', e);
+    return { ...data, id: crypto.randomUUID(), status: 'pending', answerCount: 0, createdAt: new Date().toISOString() };
+  }
 }
 
 // Supabase未設定時のフォールバック

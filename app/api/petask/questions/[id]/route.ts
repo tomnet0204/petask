@@ -1,30 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabase } from '@/lib/petask/supabase';
+import { getQuestionById } from '@/lib/petask/db/questions';
+import { getAnswersByQuestionId } from '@/lib/petask/db/answers';
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = createServerSupabase();
-
-  if (!supabase) {
-    return NextResponse.json({ question: null, answers: [], isMock: true });
+  try {
+    const question = await getQuestionById(id);
+    if (!question) return NextResponse.json({ error: '質問が見つかりません' }, { status: 404 });
+    const answers = await getAnswersByQuestionId(id);
+    return NextResponse.json({ question, answers });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'サーバーエラー' }, { status: 500 });
   }
-
-  const { data: question, error } = await supabase
-    .from('questions')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 404 });
-
-  const { data: answers } = await supabase
-    .from('answers')
-    .select('*, vets(*)')
-    .eq('question_id', id)
-    .order('created_at', { ascending: true });
-
-  return NextResponse.json({ question, answers: answers ?? [] });
 }
